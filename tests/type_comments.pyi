@@ -16,8 +16,8 @@ E: TypeAlias = None#    type: int  # Y033 Do not use type comments in stubs (e.g
 F: TypeAlias = None#type:int  # Y033 Do not use type comments in stubs (e.g. use "x: int" instead of "x = ... # type: int")
 
 def func(
-    arg1,  # type: dict[str, int]  # Y033 Do not use type comments in stubs (e.g. use "x: int" instead of "x = ... # type: int")
-    arg2  # type: Sequence[bytes]  # And here's some more info about this arg  # Y033 Do not use type comments in stubs (e.g. use "x: int" instead of "x = ... # type: int")
+    arg1,  # type: dict[str, int]  # Y033 Do not use type comments in stubs (e.g. use "x: int" instead of "x = ... # type: int") # Y099 Parameter name arg1 is not allowed (matches /^arg\d+$/)
+    arg2  # type: Sequence[bytes]  # And here's some more info about this arg  # Y033 Do not use type comments in stubs (e.g. use "x: int" instead of "x = ... # type: int") # Y099 Parameter name arg2 is not allowed (matches /^arg\d+$/)
 ): ...
 
 class Foo:

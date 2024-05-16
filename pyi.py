@@ -2221,6 +2221,10 @@ class PyiVisitor(ast.NodeVisitor):
             self.error(node, Y050)
         if _is_Incomplete(node.annotation):
             self.error(node, Y065.format(what=f'parameter "{node.arg}"'))
+        for pattern in PyiTreeChecker._bad_argument_names:
+            if pattern.match(node.arg):
+                self.error(node, Y099.format(arg_name=node.arg, patterns=", ".join(f"/{p.pattern}/" for p in PyiTreeChecker._bad_argument_names)))
+                break
         with self.visiting_arg.enabled():
             self.generic_visit(node)
 
@@ -2330,11 +2334,20 @@ class PyiTreeChecker:
             parse_from_config=True,
             help="don't patch flake8 with .pyi-aware file checker",
         )
+        parser.add_option(
+            "--prohibit-argument-name",
+            parse_from_config=True,
+            nargs="+",
+            default=[r"^arg\d+$"],
+            help="regular expression matching prohibited argument names in stubs",
+        )
 
-    @staticmethod
-    def parse_options(options: argparse.Namespace) -> None:
+    @classmethod
+    def parse_options(cls, options: argparse.Namespace) -> None:
         if not options.no_pyi_aware_file_checker:
             checker.FileChecker = PyiAwareFileChecker
+        if options.prohibit_argument_name:
+            cls._bad_argument_names = [re.compile(p) for p in options.prohibit_argument_name]
 
 
 # Please keep error code lists in ERRORCODES and CHANGELOG up to date
@@ -2453,5 +2466,6 @@ Y090 = (
     '"a tuple of length 1, in which the sole element is of type {typ!r}". '
     'Perhaps you meant "{new}"?'
 )
+Y099 = "Y099 Parameter name {arg_name} is not allowed (matches {patterns})"
 
 DISABLED_BY_DEFAULT = ["Y090"]
